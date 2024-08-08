@@ -9,5 +9,6 @@ public class OnlineFoodOrderingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OnlineFoodOrderingApplication.class, args);
 	}
+	//berkay gmrk
 
 }
