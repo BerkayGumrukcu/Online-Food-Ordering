@@ -31,23 +31,24 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
         if (jwt!=null){
             jwt = jwt.substring(7);
-        }
 
-        try{
-            SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
-            Claims claims= Jwts.parser().setSigningKey(key).build().parseClaimsJwt(jwt).getBody();
+            try{
+                SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
+                Claims claims= Jwts.parser().setSigningKey(key).build().parseClaimsJwt(jwt).getBody();
 
-            String email = String.valueOf(claims.get("email"));
-            String authorities= String.valueOf((claims.get("authorities")));
+                String email = String.valueOf(claims.get("email"));
+                String authorities= String.valueOf((claims.get("authorities")));
 
-            //ROLE_CUSTOMER,ROLE_ADMIN
+                //ROLE_CUSTOMER,ROLE_ADMIN
 
-            List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(email,null,auth);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-        catch (Exception e){
-            throw new BadCredentialsException("Geçersiz Token.......");
+                List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(email,null,auth);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            catch (Exception e){
+                throw new BadCredentialsException("Geçersiz Token.......");
+            }
+
         }
 
         filterChain.doFilter(request,response);
