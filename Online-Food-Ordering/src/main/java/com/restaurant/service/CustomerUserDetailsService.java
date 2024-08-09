@@ -26,7 +26,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user=userRepository.findByEmail(username);
-        if (user!=null){
+        if (user==null){
             throw new UsernameNotFoundException("Kullanıcı Bulunamadı"+ username);
         }
         USER_ROLE role=user.getRole();

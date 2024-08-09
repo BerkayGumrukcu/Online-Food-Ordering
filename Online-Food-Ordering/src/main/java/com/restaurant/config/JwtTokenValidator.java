@@ -1,7 +1,6 @@
 package com.restaurant.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,13 +27,12 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         String jwt=request.getHeader(JwtConstant.JWT_HEADER);
 
 
-
         if (jwt!=null){
             jwt = jwt.substring(7);
 
             try{
                 SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
-                Claims claims= Jwts.parser().setSigningKey(key).build().parseClaimsJwt(jwt).getBody();
+                Claims claims= Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
 
                 String email = String.valueOf(claims.get("email"));
                 String authorities= String.valueOf((claims.get("authorities")));

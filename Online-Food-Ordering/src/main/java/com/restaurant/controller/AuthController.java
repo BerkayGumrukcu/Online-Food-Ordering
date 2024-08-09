@@ -91,7 +91,7 @@ public class AuthController  {
         String role=authorities.isEmpty()?null:authorities.iterator().next().getAuthority();
         AuthResponse authResponse=new AuthResponse();
         authResponse.setJwt(jwt);
-        authResponse.setMessage("Kayıt Başarılı");
+        authResponse.setMessage("Giriş Başarılı");
 
         authResponse.setRole(USER_ROLE.valueOf(role));
 
