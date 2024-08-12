@@ -13,37 +13,43 @@ import java.util.Optional;
 public class CategoryServiceImp implements CategoryService {
 
     @Autowired
-    private RestaurantService restaurantService;
+    private RestaurantService restaurantService; // Restoran bilgilerini almak için kullanılan servis.
 
-    private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository; // Kategori verilerini veritabanında yönetmek için kullanılan repository.
 
     @Override
     public Category createCategory(String name, Long userId) throws Exception {
-
+        // Kullanıcının restoranını alır.
         Restaurant restaurant = restaurantService.getRestaurantByUserId(userId);
+
+        // Yeni bir kategori oluşturur ve restoran ile ilişkilendirir.
         Category category = new Category();
         category.setName(name);
         category.setRestaurant(restaurant);
 
-
+        // Kategoriyi veritabanına kaydeder ve döner.
         return categoryRepository.save(category);
     }
 
     @Override
     public List<Category> findCategoryByRestaurantId(Long id) throws Exception {
+        // Restoranı alır ve belirtilen ID'ye sahip restorana ait kategorileri alır.
         Restaurant restaurant = restaurantService.getRestaurantByUserId(id);
         return categoryRepository.findByRestaurantId(restaurant.getId());
     }
 
     @Override
     public Category findCategoryById(Long id) throws Exception {
-
+        // Belirtilen ID'ye sahip kategoriyi bulur.
         Optional<Category> optionalCategory = categoryRepository.findById(id);
 
-        if (optionalCategory.isEmpty()){
+        if (optionalCategory.isEmpty()) {
+            // Kategori bulunamazsa bir istisna fırlatır.
             throw new Exception("Kategori bulunamadı");
         }
-        return optionalCategory.get();
 
+        // Kategoriyi döner.
+        return optionalCategory.get();
     }
 }

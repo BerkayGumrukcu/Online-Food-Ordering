@@ -21,8 +21,16 @@ public class CategoryController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Yeni bir kategori oluşturur.
+     *
+     * @param category Oluşturulacak kategori bilgilerini içeren istek nesnesi.
+     * @param jwt Kullanıcı kimliğini doğrulamak için kullanılan JWT.
+     * @return Oluşturulan kategori bilgilerini içeren yanıt.
+     * @throws Exception Eğer kategori oluşturma işlemi sırasında bir hata oluşursa bir istisna fırlatır.
+     */
     @PostMapping("/admin/category")
-    public ResponseEntity<Category> createCategory(@RequestBody Category category, @RequestHeader ("Authorization") String jwt) throws Exception{
+    public ResponseEntity<Category> createCategory(@RequestBody Category category, @RequestHeader ("Authorization") String jwt) throws Exception {
 
         User user = userService.findUserByJwtToken(jwt);
 
@@ -31,14 +39,20 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
+    /**
+     * Kullanıcının restoranına ait kategorileri alır.
+     *
+     * @param jwt Kullanıcı kimliğini doğrulamak için kullanılan JWT.
+     * @return Kullanıcının restoranına ait kategorileri içeren yanıt.
+     * @throws Exception Eğer kategori alma işlemi sırasında bir hata oluşursa bir istisna fırlatır.
+     */
     @GetMapping("/category/restaurant")
-    public ResponseEntity<List<Category>> getRestaurantCategory(@RequestHeader ("Authorization") String jwt) throws Exception{
+    public ResponseEntity<List<Category>> getRestaurantCategory(@RequestHeader ("Authorization") String jwt) throws Exception {
 
         User user = userService.findUserByJwtToken(jwt);
 
         List<Category> categories = categoryService.findCategoryByRestaurantId(user.getId());
 
-        return new ResponseEntity<>(categories, HttpStatus.CREATED);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
-
 }

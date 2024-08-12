@@ -1,6 +1,5 @@
 package com.restaurant.controller;
 
-
 import com.restaurant.model.Food;
 import com.restaurant.model.Restaurant;
 import com.restaurant.model.User;
@@ -28,8 +27,16 @@ public class FoodController {
     @Autowired
     private RestaurantService restaurantService;
 
+    /**
+     * Belirli bir isimle yemekleri arar.
+     *
+     * @param name Aranacak yemek adı.
+     * @param jwt Kullanıcı kimliğini doğrulamak için kullanılan JWT.
+     * @return Arama sonuçlarını içeren yemek listesini döner.
+     * @throws Exception Eğer yemek arama işlemi sırasında bir hata oluşursa bir istisna fırlatır.
+     */
     @GetMapping("/search")
-    public ResponseEntity<List<Food>> searchFood(@RequestParam String name, @RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<List<Food>> searchFood(@RequestParam String name, @RequestHeader("Authorization") String jwt) throws Exception {
 
         User user = userService.findUserByJwtToken(jwt);
 
@@ -38,22 +45,31 @@ public class FoodController {
         return new ResponseEntity<>(foods, HttpStatus.OK);
     }
 
+    /**
+     * Belirli bir restoran için yemekleri getirir.
+     *
+     * @param vageterian Vejetaryen yemekleri dahil etmek için kullanılan parametre.
+     * @param seasonal Mevsimsel yemekleri dahil etmek için kullanılan parametre.
+     * @param nonveg Et yemeyen yemekleri dahil etmek için kullanılan parametre.
+     * @param food_category Yemek kategorisi (isteğe bağlı).
+     * @param restaurantId Restoran ID'si.
+     * @param jwt Kullanıcı kimliğini doğrulamak için kullanılan JWT.
+     * @return Belirtilen kriterlere göre yemekleri içeren listeyi döner.
+     * @throws Exception Eğer yemekleri getirme işlemi sırasında bir hata oluşursa bir istisna fırlatır.
+     */
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<List<Food>> getRestaurantFood(@RequestParam boolean vageterian,
                                                         @RequestParam boolean seasonal,
                                                         @RequestParam boolean nonveg,
                                                         @RequestParam(required = false) String food_category,
                                                         @PathVariable Long restaurantId,
-                                                        @RequestHeader("Authorization") String jwt) throws Exception{
+                                                        @RequestHeader("Authorization") String jwt) throws Exception {
 
         User user = userService.findUserByJwtToken(jwt);
 
-        List<Food> foods = foodService.getRestaurantsFood(restaurantId,vageterian,seasonal,nonveg,food_category);
+        List<Food> foods = foodService.getRestaurantsFood(restaurantId, vageterian, seasonal, nonveg, food_category);
 
         return new ResponseEntity<>(foods, HttpStatus.OK);
     }
-
-
-
 
 }
