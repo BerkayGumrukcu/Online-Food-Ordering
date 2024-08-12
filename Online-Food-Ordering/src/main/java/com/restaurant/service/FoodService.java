@@ -9,18 +9,21 @@ import java.util.List;
 
 public interface FoodService {
 
-
+    // Yeni bir yiyecek oluşturmak için kullanılır.
     public Food createFood(CreateFoodRequest req, Category category, Restaurant restaurant);
 
+    // Belirtilen ID'ye sahip bir yiyeceği silmek için kullanılır.
     public void deleteFood(Long foodId) throws Exception;
 
-    public List<Food> getRestaurantsFood(Long restaurantId, boolean isVegatarian, boolean isNonveg, boolean isSeasonal, String foodCategory);
+    // Belirli bir restorana ait yiyecekleri, verilen filtrelerle almak için kullanılır.
+    public List<Food> getRestaurantsFood(Long restaurantId, boolean isVegetarian, boolean isNonveg, boolean isSeasonal, String foodCategory);
 
+    // Yiyecekleri anahtar kelimeye göre aramak için kullanılır.
     public List<Food> searchFood(String keyword);
 
-    public Food findFoodById(Long foodId) throws  Exception;
+    // Belirtilen ID'ye sahip bir yiyeceği bulmak için kullanılır.
+    public Food findFoodById(Long foodId) throws Exception;
 
+    // Belirtilen ID'ye sahip bir yiyeceğin mevcut olup olmadığını güncellemek için kullanılır.
     public Food updateAvailabilityStatus(Long foodId) throws Exception;
-
-
 }

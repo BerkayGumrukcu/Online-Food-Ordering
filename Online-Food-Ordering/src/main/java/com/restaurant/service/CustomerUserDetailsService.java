@@ -14,26 +14,30 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-//Password Security
-
+// Spring Security için kullanıcı detaylarını yönetir.
 @Service
 public class CustomerUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
-
+    private UserRepository userRepository; // Kullanıcı bilgilerini veritabanından almak için kullanılan repository.
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user=userRepository.findByEmail(username);
-        if (user==null){
-            throw new UsernameNotFoundException("Kullanıcı Bulunamadı"+ username);
+        // Veritabanından kullanıcıyı email ile bulur.
+        User user = userRepository.findByEmail(username);
+        if (user == null) {
+            // Kullanıcı bulunamazsa bir istisna fırlatır.
+            throw new UsernameNotFoundException("Kullanıcı Bulunamadı: " + username);
         }
-        USER_ROLE role=user.getRole();
-        List<GrantedAuthority> authorities=new ArrayList<>();
 
+        // Kullanıcının rolünü alır.
+        USER_ROLE role = user.getRole();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        // Kullanıcının rolünü yetki listesine ekler.
         authorities.add(new SimpleGrantedAuthority(role.toString()));
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),authorities);
+        // UserDetails nesnesi oluşturur ve döner. Bu nesne, kullanıcı adı, şifre ve yetkileri içerir.
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }

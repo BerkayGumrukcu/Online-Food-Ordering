@@ -13,9 +13,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.security.Security;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,42 +21,58 @@ import java.util.List;
 @EnableWebSecurity
 public class AppConfig {
 
+    // Bean olarak SecurityFilterChain nesnesini tanımlar
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http)throws  Exception{
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Oturum yönetimini stateless (durumsuz) olarak ayarlar
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(Authorize -> Authorize
-                        .requestMatchers("/api/admin/**").hasAnyRole("RESTAURANT_OWNER","ADMIN")
+                        // /api/admin/** yoluna erişim sadece 'RESTAURANT_OWNER' veya 'ADMIN' rolüne sahip kullanıcılar için izinlidir
+                        .requestMatchers("/api/admin/**").hasAnyRole("RESTAURANT_OWNER", "ADMIN")
+                        // /api/** yoluna erişim sadece kimlik doğrulama gerektirir
                         .requestMatchers("/api/**").authenticated()
+                        // Diğer tüm yollar için erişim izni verilir
                         .anyRequest().permitAll()
-                ).addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-                .csrf(csrf->csrf.disable())
-                .cors(cors->cors.configurationSource(corsConfigrationSource()));
+                )
+                // JwtTokenValidator adlı özel filtreyi, BasicAuthenticationFilter öncesinde çalışacak şekilde ekler
+                .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
+                // CSRF korumasını devre dışı bırakır
+                .csrf(csrf -> csrf.disable())
+                // CORS yapılandırmasını belirtir ve corsConfigrationSource yöntemini kullanır
+                .cors(cors -> cors.configurationSource(corsConfigrationSource()));
 
         return http.build();
     }
 
+    // CORS yapılandırmasını oluşturan yöntem
     private CorsConfigurationSource corsConfigrationSource() {
         return new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration cfg=new CorsConfiguration();
+                CorsConfiguration cfg = new CorsConfiguration();
+                // İzin verilen kökenleri (origins) belirtir
                 cfg.setAllowedOrigins(Arrays.asList(
                         "https://zosh-food.vercel.app",
                         "http://localhost:3000"
                 ));
-
+                // İzin verilen HTTP yöntemlerini belirtir
                 cfg.setAllowedMethods(Collections.singletonList("*"));
+                // Çerezlerin (cookies) paylaşımına izin verir
                 cfg.setAllowCredentials(true);
+                // İzin verilen başlıkları belirtir
                 cfg.setAllowedHeaders(Collections.singletonList("*"));
+                // İstemci tarafına döndürülen başlıkları belirtir
                 cfg.setExposedHeaders(List.of("Authorization"));
+                // CORS isteğinin önbellek süresini belirtir
                 cfg.setMaxAge(3600L);
                 return cfg;
             }
         };
     }
 
+    // Şifrelerin güvenli bir şekilde şifrelenmesini sağlayan PasswordEncoder nesnesini tanımlar
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

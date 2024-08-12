@@ -20,36 +20,44 @@ import java.util.List;
 
 public class JwtTokenValidator extends OncePerRequestFilter {
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String jwt=request.getHeader(JwtConstant.JWT_HEADER);
+        // İstekten JWT'yi alır
+        String jwt = request.getHeader(JwtConstant.JWT_HEADER);
 
-
-        if (jwt!=null){
+        if (jwt != null) {
+            // "Bearer " ifadesini çıkarır
             jwt = jwt.substring(7);
 
-            try{
+            try {
+                // Gizli anahtar ile JWT'yi doğrular
                 SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
-                Claims claims= Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(key) // İmzalama anahtarını belirler
+                        .build()
+                        .parseClaimsJws(jwt) // JWT'yi parse eder
+                        .getBody(); // JWT'nin gövdesini alır
 
+                // JWT'den e-posta ve yetkileri alır
                 String email = String.valueOf(claims.get("email"));
-                String authorities= String.valueOf((claims.get("authorities")));
+                String authorities = String.valueOf(claims.get("authorities"));
 
-                //ROLE_CUSTOMER,ROLE_ADMIN
+                // Yetkileri ayrıştırır
+                List<GrantedAuthority> auth = AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
 
-                List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
-                Authentication authentication = new UsernamePasswordAuthenticationToken(email,null,auth);
+                // Kullanıcı kimlik doğrulama nesnesini oluşturur
+                Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, auth);
+
+                // Authentication nesnesini SecurityContext'e ayarlar
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
+                // Token geçersizse hata fırlatır
                 throw new BadCredentialsException("Geçersiz Token.......");
             }
-
         }
 
-        filterChain.doFilter(request,response);
-
+        // İsteği bir sonraki filtreye iletir
+        filterChain.doFilter(request, response);
     }
 }
